@@ -1,6 +1,6 @@
 # Sage Development setup
 
-## Using docker
+## Using docker (persist env across runs)
 
 This setup allows source to be on the host and sets up docker to run and test
 sage. Clone this repo:
@@ -33,6 +33,7 @@ This should drop you in a shell prompt within the container with the conda base
 environment activated. Setup dependencies using mamba
 
 ```bash
+export SAGE_NUM_THREADS=16
 cd ~/src/sage
 mamba env create --file src/environment-dev-3.11-linux.yml --name sage-dev
 conda activate sage-dev
@@ -49,7 +50,26 @@ Now the env is ready for development. Use your favourite editor on the host to
 make changes and re-run sage as explained in the [sage
 docs](https://doc.sagemath.org/html/en/developer/walkthrough.html#chapter-walkthrough).
 
-## Ephemeral docker container
+When done working with sage, just quit the docker container by exiting sage and
+the shell (with `exit`)
+
+### Re-using persisted environment
+
+To resume development, re-run the container:
+
+```bash
+docker run -it --rm --name sage-dev --hostname sage-dev \
+  --mount source=sage_env,target=/home/user/miniforge3/envs \
+  --mount type=bind,source=${PWD},target=/home/user/src \
+  sage-dev:latest
+```
+This once again drops you in a shell within the container. Activate the conda
+environment with: `conda activate sage-dev`
+
+This will restore the env from the previous session. Rebuild/ run sage as
+usual.
+
+## Ephemeral docker container (fresh build every time)
 
 Start the container:
 
