@@ -127,3 +127,55 @@ pip install --no-build-isolation --config-settings editable_mode=compat -v \
 which sage
 sage -c 'print(version())'
 ```
+
+## Using WSL
+
+This setup allows sage to be setup using WSL. The steps below can be run inside
+a folder on the Windows file-system (e.g., `C:\Users\me\`) or in a directory
+within the WSL file-system. If the files are on Windows file-system then it may
+be easier to edit them using IDEs installed on Windows. However, this is
+experimental and may result in problems due to the way Windows and Linux treat
+files.
+
+Either way, start a bash-shell within WSL and change to the directory where you
+want to work with sage.
+
+```bash
+mkdir -p sage-dev
+cd sage-dev
+```
+
+Setup the source code repository and the virtual env:
+
+```bash
+git clone --origin upstream git@github.com:sagemath/sage.git
+sudo apt-get update && \
+  sudo apt-get -y upgrade && \
+  sudo apt-get install -y git build-essential m4 tmux python3 python3-pip curl vim
+
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh" && \
+  bash Miniforge3-Linux-x86_64.sh -b -p ${HOME}/miniforge3 && \
+  ${HOME}/miniforge3/bin/python -m conda init bash && \
+  ${HOME}/miniforge3/bin/python -m mamba.mamba init
+```
+
+Bootstrap and build sage from sources:
+
+```bash
+export SAGE_NUM_THREADS=16  # Adjust to a value equal to number of cores on your system
+cd sage
+mamba env create --file src/environment-dev-3.11-linux.yml --name sage-dev
+conda activate sage-dev
+./bootstrap
+pip install --no-build-isolation -v -v --editable ./pkgs/sage-conf_conda \
+  ./pkgs/sage-setup
+pip install --no-build-isolation --config-settings editable_mode=compat -v \
+  -v --editable ./src
+which sage
+sage -c 'print(version())'
+```
+
+Now the env is ready for development. Use your favourite editor on the host to
+make changes and re-run sage as explained in the [sage
+docs](https://doc.sagemath.org/html/en/developer/walkthrough.html#chapter-walkthrough).
+
