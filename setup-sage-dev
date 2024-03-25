@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+cd ~/src/sage || (
+	echo "Sage sources missing!"
+	exit 1
+)
+mamba env create --file src/environment-dev-3.11-linux.yml --name sage-dev
+conda activate sage-dev
+./bootstrap
+pip install --no-build-isolation -v -v --editable ./pkgs/sage-conf_conda ./pkgs/sage-setup
+pip install --no-build-isolation --config-settings editable_mode=compat -v -v --editable ./src
+which sage
+sage -c 'print(version())'
