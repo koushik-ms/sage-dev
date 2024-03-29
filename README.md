@@ -179,3 +179,5 @@ Now the env is ready for development. Use your favourite editor on the host to
 make changes and re-run sage as explained in the [sage
 docs](https://doc.sagemath.org/html/en/developer/walkthrough.html#chapter-walkthrough).
 
+When done working with sage, just quit sage and the virtual environment (with
+`exit`).
